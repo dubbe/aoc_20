@@ -42,14 +42,14 @@ func a(lines []string) int {
 			set[char] = true
 		}
 		if(line == "") {
-			count = len(set) + count 
+			count += len(set) 
 			set = make(map[rune]bool)
 		}
 	}
 
-	count = len(set) + count 
+	count += len(set) 
 
-	fmt.Printf("Result for a is: %v \n", count)
+	fmt.Printf("Result for a is: %v\n", count)
 	return count
 }
 
@@ -59,7 +59,7 @@ func b(lines []string) int {
 	i := 0
 	for _, line := range lines {
 		for _, char := range line {
-			set[char] = set[char] + 1
+			set[char]++
 		}
 		
 		if(line == "") {
@@ -80,7 +80,7 @@ func b(lines []string) int {
 			count++
 		} 
 	}
-	fmt.Printf("Result for b is: %v \n", count)
+	fmt.Printf("Result for b is: %v\n", count)
 	return count
 }
 
