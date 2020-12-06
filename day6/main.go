@@ -1,86 +1,65 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"os"
+	"strings"
+	"unicode"
+
+	"github.com/dubbe/advent-of-code-2020/helpers"
 )
 
-func check(e error) {
-	if e != nil {
-			panic(e)
-	}
-}
-
-func readLines(path string) ([]string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-			return nil, err
-	}
-	defer file.Close()
-
-	var lines []string
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-			lines = append(lines, scanner.Text())
-	}
-	return lines, scanner.Err()
-}
 
 func main() {
-	lines, err := readLines("input")
-	check(err)
+	lines, err := helpers.ReadGroups("input")
+	helpers.Check(err)
 	a(lines)
 	b(lines)
 }
 
-func a(lines []string) int {
-	set := make(map[rune]bool)
+func a(groups []string) int {
 	count := 0
-	for _, line := range lines {
-		for _, char := range line {
-			set[char] = true
-		}
-		if(line == "") {
-			count += len(set) 
-			set = make(map[rune]bool)
-		}
+	for _, lines := range groups {
+		count += countUnique(strings.Split(lines, "\n"))
 	}
 
-	count += len(set) 
-
-	fmt.Printf("Result for a is: %v\n", count)
 	return count
 }
 
-func b(lines []string) int {
-	set := make(map[rune]int)
+func b(groups []string) int {
 	count := 0
-	i := 0
+
+	for _, lines := range groups {
+		count += countSum(lines)
+	}
+
+	return count
+}
+
+func countUnique(lines []string) int {
+	uniqueChars := map[rune]bool{}
 	for _, line := range lines {
 		for _, char := range line {
-			set[char]++
+			uniqueChars[char] = true
 		}
-		
-		if(line == "") {
-			for _, v := range set {
-				if(v == i) {
-					count++
-				} 
-			}
-			i = 0
-			set = make(map[rune]int)
-		} else {
-			i++
+	}
+	return len(uniqueChars)
+}
+
+func countSum(lines string) int {
+	passenger := strings.Count(lines, "\n") + 1
+
+	uniqueChars := map[rune]int{}
+	count := 0
+	for _, char := range lines {
+		if(unicode.IsLetter(char)) {
+			uniqueChars[char]++
+		}
+	}
+	for _, test := range uniqueChars {
+		if(test == passenger) {
+			count++
 		}
 	}
 
-	for _, v := range set {
-		if(v == i) {
-			count++
-		} 
-	}
-	fmt.Printf("Result for b is: %v\n", count)
 	return count
 }
 
