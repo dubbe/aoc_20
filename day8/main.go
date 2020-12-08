@@ -12,8 +12,6 @@ import (
 func main() {
 	lines, err := helpers.ReadLines("input")
 	helpers.Check(err)
-
-	
 	a(lines)
 	b(lines)
 }
@@ -27,7 +25,6 @@ func a(lines []string) int {
 		ranLines[lineIndex] = true
 		executeLine(lines[lineIndex], &accumulator, &lineIndex)
 		if(ranLines[lineIndex]) {
-
 			break
 		}
 	}
