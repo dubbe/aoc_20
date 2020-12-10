@@ -47,7 +47,6 @@ func b(lines []int) int {
 		}
 		for _, v := range lines[lowest:i] {
 			if adapter - v <= 3 {
-				fmt.Printf("a: %v, sum: %v \n", adapter, configurations[adapter])
 				configurations[adapter] += configurations[v]
 			}
 			
