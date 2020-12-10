@@ -36,49 +36,28 @@ func a(lines []int) int {
 
 func b(lines []int) int {
 	lines = append(lines, 0)
-	sort.Sort(sort.Reverse(sort.IntSlice(lines)))
+	sort.Ints(lines)
 
 	configurations := map[int]int{}
-	for i, adapter := range lines {
 
-		from := i+1
-		to := i+4
-		if(to > len(lines)) {
-			to = len(lines)
-		}
-		possibleNextAdapters := lines[from:to]
-		found := 0 
-		for _, v := range possibleNextAdapters {
-			if(adapter == 0) {
-				found = 1
-			} else if v != 0 && adapter - v <= 3 {
-				found++
-			}
-		}
-		configurations[adapter] = found
-	}
-
-	sort.Ints(lines)
-	sum := 0
 	for i, adapter := range lines {
 		lowest := i-3
 		if(lowest < 0) {
 			lowest = 0
 		}
-		possibleNextAdapters := lines[lowest:i]
-		sum = 0
-		for _, v := range possibleNextAdapters {
+		for _, v := range lines[lowest:i] {
 			if adapter - v <= 3 {
-				sum += configurations[v]
+				fmt.Printf("a: %v, sum: %v \n", adapter, configurations[adapter])
+				configurations[adapter] += configurations[v]
 			}
+			
 		}
-		if sum == 0 {
-			sum = 1
+		if(configurations[adapter] == 0) {
+			configurations[adapter] = 1
 		}
-		configurations[adapter] = sum
-	}
 
-	fmt.Printf("Result B is: %d", sum)
-	return sum
+	}
+	fmt.Printf("Result B is: %d", configurations[lines[len(lines)-1]])
+	return configurations[lines[len(lines)-1]]
 }
 

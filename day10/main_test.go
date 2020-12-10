@@ -27,3 +27,9 @@ func TestB2(t *testing.T) {
 	lines, _ := helpers.ReadInts("input_test_a_2")
 	assert.Equal(t, 19208, b(lines))
 }
+
+func TestB3(t *testing.T) {
+	lines, _ := helpers.ReadInts("input")
+	assert.Equal(t, 453551299002368, b(lines))
+}
+
