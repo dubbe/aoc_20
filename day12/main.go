@@ -113,12 +113,12 @@ func abs(x int) int {
 func turnShip(currentDirection rune, degrees int, direction rune) rune {
 	possibleDirections := []rune{north, east, south, west}
 	currentIndex := findIndex(possibleDirections, currentDirection)
-	
+
 	change := degrees / 90
 
 	if direction == left {
 		change = -change
-	} 
+	}
 	rotatedSlice := rotateRuneSlice(possibleDirections, change)
 	return rotatedSlice[currentIndex]
 }
@@ -134,7 +134,7 @@ func findIndex(slice []rune, find rune) int {
 
 func rotateRuneSlice(slice []rune, d int) []rune {
 	if d < 0 {
-		d = len(slice)+d
+		d = len(slice) + d
 	}
 	slice = append(slice[d:], slice[0:d]...)
 	return slice
@@ -142,7 +142,7 @@ func rotateRuneSlice(slice []rune, d int) []rune {
 
 func rotateIntSlice(slice []int, d int) []int {
 	if d < 0 {
-		d = len(slice)+d
+		d = len(slice) + d
 	}
 	slice = append(slice[d:], slice[0:d]...)
 	return slice
@@ -151,7 +151,7 @@ func rotateIntSlice(slice []int, d int) []int {
 func rotateShip(currentDirection rune, degrees int, direction rune, x int, y int) (rune, int, int) {
 	newDirection := turnShip(currentDirection, degrees, direction)
 
-	coordinates := []int{0,0,0,0}
+	coordinates := []int{0, 0, 0, 0}
 
 	if y > 0 {
 		coordinates[0] = y
@@ -169,10 +169,9 @@ func rotateShip(currentDirection rune, degrees int, direction rune, x int, y int
 
 	if direction == right {
 		change = -change
-	} 
+	}
 
 	coordinates = rotateIntSlice(coordinates, change)
-
 
 	if coordinates[0] != 0 {
 		y = coordinates[0]

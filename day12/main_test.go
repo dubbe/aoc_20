@@ -74,25 +74,24 @@ func TestRotateShip(t *testing.T) {
 	// assert.Equal(t, -10, y)
 }
 
-
 func TestRotateSlice(t *testing.T) {
- slice := []rune{'N', 'E', 'S', 'W'}
- expected := []rune{ 'E', 'S', 'W', 'N'}
- assert.Equal(t, expected, rotateRuneSlice(slice, 1))
+	slice := []rune{'N', 'E', 'S', 'W'}
+	expected := []rune{'E', 'S', 'W', 'N'}
+	assert.Equal(t, expected, rotateRuneSlice(slice, 1))
 
- slice = []rune{'N', 'E', 'S', 'W'}
- expected = []rune{ 'S', 'W', 'N', 'E'}
- assert.Equal(t, expected, rotateRuneSlice(slice, 2))
+	slice = []rune{'N', 'E', 'S', 'W'}
+	expected = []rune{'S', 'W', 'N', 'E'}
+	assert.Equal(t, expected, rotateRuneSlice(slice, 2))
 
- slice = []rune{'N', 'E', 'S', 'W'}
- expected = []rune{ 'W', 'N', 'E', 'S'}
- assert.Equal(t, expected, rotateRuneSlice(slice, 3))
+	slice = []rune{'N', 'E', 'S', 'W'}
+	expected = []rune{'W', 'N', 'E', 'S'}
+	assert.Equal(t, expected, rotateRuneSlice(slice, 3))
 
- slice = []rune{'N', 'E', 'S', 'W'}
- expected = []rune{ 'W', 'N', 'E', 'S' }
- assert.Equal(t, expected, rotateRuneSlice(slice, -1))
+	slice = []rune{'N', 'E', 'S', 'W'}
+	expected = []rune{'W', 'N', 'E', 'S'}
+	assert.Equal(t, expected, rotateRuneSlice(slice, -1))
 
- slice = []rune{'N', 'E', 'S', 'W'}
- expected = []rune{ 'S', 'W', 'N', 'E' }
- assert.Equal(t, expected, rotateRuneSlice(slice, -2))
+	slice = []rune{'N', 'E', 'S', 'W'}
+	expected = []rune{'S', 'W', 'N', 'E'}
+	assert.Equal(t, expected, rotateRuneSlice(slice, -2))
 }
