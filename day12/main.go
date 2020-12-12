@@ -8,7 +8,6 @@ import (
 	"github.com/dubbe/advent-of-code-2020/helpers"
 )
 
-
 func main() {
 	start := time.Now()
 	lines, err := helpers.ReadLines("input")
@@ -19,205 +18,172 @@ func main() {
 	fmt.Printf("Solution took %s \n", elapsed)
 }
 
+const (
+	forward = 'F'
+	left    = 'L'
+	right   = 'R'
+	north   = 'N'
+	east    = 'E'
+	south   = 'S'
+	west    = 'W'
+)
+
 func a(lines []string) int {
-	facingDirection := 'E'
-	x := 0
-	y := 0
+	facingDirection := east
+	x, y := 0, 0
 
 	for _, line := range lines {
-		newDirection := facingDirection
-		for i, r := range line {
-			if i == 0 {
-				newDirection = r
-				break
-			}
-		}
-		distance, _ := strconv.Atoi(line[1:])
+		newDirection, distance := getTravel(facingDirection, line)
 
-		if(newDirection == 'F') {
+		if newDirection == forward {
 			newDirection = facingDirection
-		} else if (newDirection == 'L' || newDirection == 'R' ) {
+		} else if newDirection == left || newDirection == right {
 			facingDirection = turnShip(facingDirection, distance, newDirection)
-			continue;
-		} 
-
-		switch newDirection {
-		case 'N':
-			y += distance
-		case 'E':
-			x += distance
-		case 'S':
-			y += (distance*-1)
-		case 'W':
-			x += (distance*-1)
-		default:
-			fmt.Printf("ERROR, direction: %v, distance: %d \n", string(newDirection), distance)
+			continue
 		}
+
+		x, y = travel(x, y, newDirection, distance)
 	}
 
-	if(x < 0) {
-		x = x*-1
-	}
-
-	if(y < 0) {
-		y = y*-1
-	}
-	return x+y
+	return abs(x) + abs(y)
 }
 
 func b(lines []string) int {
-	facingDirection := 'E'
-	x := 0
-	y := 0
+	facingDirection := east
+	x, y := 0, 0
+
 	waypointX := 10
 	waypointY := 1
 
 	for _, line := range lines {
-		newDirection := facingDirection
-		for i, r := range line {
-			if i == 0 {
-				newDirection = r
-				break
-			}
-		}
-		distance, _ := strconv.Atoi(line[1:])
+		newDirection, distance := getTravel(facingDirection, line)
 
-		if(newDirection == 'F') {
+		if newDirection == forward {
 			x += waypointX * distance
 			y += waypointY * distance
-			continue;
-		} else if (newDirection == 'L' || newDirection == 'R' ) {
+			continue
+		} else if newDirection == left || newDirection == right {
 			facingDirection, waypointX, waypointY = rotateShip(facingDirection, distance, newDirection, waypointX, waypointY)
-			continue;
-		} 
-
-		switch newDirection {
-		case 'N':
-			waypointY += distance
-		case 'E':
-			waypointX += distance
-		case 'S':
-			waypointY += (distance*-1)
-		case 'W':
-			waypointX += (distance*-1)
-		default:
-			fmt.Printf("ERROR, direction: %v, distance: %d \n", string(newDirection), distance)
+			continue
 		}
+
+		waypointX, waypointY = travel(waypointX, waypointY, newDirection, distance)
 	}
 
-	if(x < 0) {
-		x = x*-1
-	}
-
-	if(y < 0) {
-		y = y*-1
-	}
-	return x+y
+	return abs(x) + abs(y)
 
 }
 
-func turnShip(currentDirection rune, degrees int, direction rune) rune {
-	possibleDirections := []rune{'N', 'E', 'S', 'W'}
-	currentIndex := 0
-	for i, d := range possibleDirections {
-		if(d == currentDirection) {
-			currentIndex = i
-		}
+func travel(x int, y int, direction rune, distance int) (int, int) {
+	switch direction {
+	case north:
+		y += distance
+	case east:
+		x += distance
+	case south:
+		y += -distance
+	case west:
+		x += -distance
+	default:
+		fmt.Printf("ERROR, direction: %v, distance: %d \n", string(distance), distance)
 	}
 
+	return x, y
+}
+
+func getTravel(direction rune, line string) (rune, int) {
+	newDirection := direction
+	for i, r := range line {
+		if i == 0 {
+			newDirection = r
+			break
+		}
+	}
+	distance, _ := strconv.Atoi(line[1:])
+	return newDirection, distance
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
+func turnShip(currentDirection rune, degrees int, direction rune) rune {
+	possibleDirections := []rune{north, east, south, west}
+	currentIndex := findIndex(possibleDirections, currentDirection)
+	
 	change := degrees / 90
 
-	if direction == 'R' {
-		newIndex := change + currentIndex
-		for {
-			if newIndex >= 4  {
-				newIndex = newIndex - len(possibleDirections)
-			} else {
-				break
-			}
-		}
-		return possibleDirections[newIndex]
-	} else {
-		newIndex := currentIndex - change 
-		for {
-			if newIndex < 0 {
-				newIndex = newIndex + len(possibleDirections)
-			} else {
-				break
-			}
-		}
-		return possibleDirections[newIndex]
-	}
+	if direction == left {
+		change = -change
+	} 
+	rotatedSlice := rotateRuneSlice(possibleDirections, change)
+	return rotatedSlice[currentIndex]
+}
 
+func findIndex(slice []rune, find rune) int {
+	for i, d := range slice {
+		if d == find {
+			return i
+		}
+	}
+	return 0
+}
+
+func rotateRuneSlice(slice []rune, d int) []rune {
+	if d < 0 {
+		d = len(slice)+d
+	}
+	slice = append(slice[d:], slice[0:d]...)
+	return slice
+}
+
+func rotateIntSlice(slice []int, d int) []int {
+	if d < 0 {
+		d = len(slice)+d
+	}
+	slice = append(slice[d:], slice[0:d]...)
+	return slice
 }
 
 func rotateShip(currentDirection rune, degrees int, direction rune, x int, y int) (rune, int, int) {
 	newDirection := turnShip(currentDirection, degrees, direction)
 
-	n := 0
-	e := 0
-	s := 0
-	w := 0
+	coordinates := []int{0,0,0,0}
 
-	if(x > 0) {
-		e = x
+	if y > 0 {
+		coordinates[0] = y
 	} else {
-		w = x * -1
+		coordinates[2] = y * -1
 	}
 
-	if(y > 0) {
-		n = y
+	if x > 0 {
+		coordinates[1] = x
 	} else {
-		s = y * -1
+		coordinates[3] = x * -1
 	}
 
-	newN := 0
-	newE := 0
-	newS := 0
-	newW := 0
-	if(degrees == 180) {
-		newN = s
-		newS = n
-		newE = w
-		newW = e
-	} else if(degrees == 90) {
-		if(direction == 'R') {
-			newE = n
-			newS = e
-			newW = s
-			newN = w
-		} else if(direction == 'L') {
-			newE = s
-			newS = w
-			newW = n
-			newN = e
-		}
-	} else if(degrees == 270) {
-		if(direction == 'R') {
-			newE = s
-			newS = w
-			newW = n
-			newN = e
-		} else if(direction == 'L') {
-			newE = n
-			newS = e
-			newW = s
-			newN = w	
-		}
+	change := degrees / 90
+
+	if direction == right {
+		change = -change
+	} 
+
+	coordinates = rotateIntSlice(coordinates, change)
+
+
+	if coordinates[0] != 0 {
+		y = coordinates[0]
 	} else {
-		fmt.Printf("ERROR, not a degree I like... %d \n", degrees)
+		y = coordinates[2] * -1
 	}
 
-	if(newN != 0) {
-		y = newN
+	if coordinates[1] != 0 {
+		x = coordinates[1]
 	} else {
-		y = newS * -1
-	}
-
-	if(newE != 0) {
-		x = newE
-	} else {
-		x = newW * -1
+		x = coordinates[3] * -1
 	}
 
 	return newDirection, x, y
