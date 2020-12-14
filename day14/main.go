@@ -9,7 +9,6 @@ import (
 	"github.com/dubbe/advent-of-code-2020/helpers"
 )
 
-
 func main() {
 	start := time.Now()
 	lines, err := helpers.ReadLines("input")
@@ -27,10 +26,10 @@ func a(lines []string) int64 {
 		l := strings.Split(line, " = ")
 		op := l[0]
 		value := l[1]
-		if(op == "mask") {
+		if op == "mask" {
 			mask = map[int]rune{}
 			for i, r := range value {
-				if(r != 'X') {
+				if r != 'X' {
 					mask[i] = r
 				}
 			}
@@ -52,7 +51,7 @@ func a(lines []string) int64 {
 	}
 	sum := int64(0)
 	for _, v := range memory {
-		sum +=v
+		sum += v
 	}
 	return sum
 }
@@ -64,10 +63,10 @@ func b(lines []string) int64 {
 		l := strings.Split(line, " = ")
 		op := l[0]
 		value := l[1]
-		if(op == "mask") {
+		if op == "mask" {
 			mask = map[int]rune{}
 			for i, r := range value {
-				if(r != '0') {
+				if r != '0' {
 					mask[i] = r
 				}
 			}
@@ -77,11 +76,11 @@ func b(lines []string) int64 {
 			o, _ := strconv.Atoi(op)
 			n, _ := strconv.Atoi(value)
 			binary := fmt.Sprintf("%036s", strconv.FormatInt(int64(o), 2))
-			binaries := []string{ binary }
-			
+			binaries := []string{binary}
+
 			for k, v := range mask {
 				newBinearies := []string{}
-				if(v == 'X') {
+				if v == 'X' {
 					for _, b := range binaries {
 						newBinearies = append(newBinearies, replaceAtIndex(b, '1', k))
 						newBinearies = append(newBinearies, replaceAtIndex(b, '0', k))
@@ -93,7 +92,7 @@ func b(lines []string) int64 {
 				}
 				binaries = newBinearies
 			}
-			
+
 			for _, b := range binaries {
 				i, err := strconv.ParseInt(b, 2, 64)
 				if err == nil {
@@ -104,7 +103,7 @@ func b(lines []string) int64 {
 	}
 	sum := int64(0)
 	for _, v := range memory {
-		sum +=v
+		sum += v
 	}
 	return sum
 
@@ -115,4 +114,3 @@ func replaceAtIndex(in string, r rune, i int) string {
 	out[i] = r
 	return string(out)
 }
-

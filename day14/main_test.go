@@ -16,4 +16,3 @@ func TestB(t *testing.T) {
 	lines, _ := helpers.ReadLines("input_test_b")
 	assert.Equal(t, int64(208), b(lines))
 }
-
