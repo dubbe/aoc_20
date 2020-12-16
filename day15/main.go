@@ -44,7 +44,7 @@ func parseSliceInt(sSlice []string) []int {
 
 func calculateLatestNumberOnTurn(startingNumbers []int, lastTurn int) int {
 
-	saidNumbers := map[int][]int{}
+	saidNumbers := make(map[int][]int, lastTurn/4)
 
 	turn := 1
 	lastNumberSpoken := 0
