@@ -12,8 +12,8 @@ func main() {
 	start := time.Now()
 	lines, err := helpers.ReadLines("input")
 	helpers.Check(err)
-	fmt.Printf("result A: %v", a(lines))
-	fmt.Printf("result B: %v", b(lines))
+	fmt.Printf("result A: %v\n", a(lines))
+	fmt.Printf("result B: %v\n", b(lines))
 	elapsed := time.Since(start)
 	fmt.Printf("Solution took %s", elapsed)
 }
