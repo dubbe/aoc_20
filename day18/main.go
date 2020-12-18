@@ -30,29 +30,62 @@ func a(lines []string) int {
 }
 
 func b(lines []string) int {
-
-	return 0
+	sum := 0
+	for _, line := range lines {
+		sum += calculateB(line)
+	}
+	return sum
 }
 
 func calculate(line string) int {
 	find := regexp.MustCompile("\\(([0-9 +*])+\\)")
 		for find.MatchString(line) {
 			line = find.ReplaceAllStringFunc(line, func(s string) string {
-				sum := calculateLine(s)
+				sum, _ := calculateLine(s)
+				return strconv.Itoa(sum)
+			})
+		}
+	sum, _ := calculateLine(line)
+	return sum
+}
+
+func calculateB(line string) int {
+	find := regexp.MustCompile("\\(([0-9 +*])+\\)")
+		for find.MatchString(line) {
+			line = find.ReplaceAllStringFunc(line, func(s string) string {
+				sum := calculateLineB(s)
 				return strconv.Itoa(sum)
 			})
 		}
 		
-	return calculateLine(line)
+	return calculateLineB(line)
 }
 
-func calculateLine(line string) int {
-	splitted := strings.Split(line, " ")
-	sum := calculateOperations(splitted)
+func calculateLineB(line string) int {
+	find := regexp.MustCompile("\\d*\\s\\+\\s\\d*")
+		for find.MatchString(line) {
+			line = find.ReplaceAllStringFunc(line, func(s string) string {
+				sum, err := calculateLine(s)
+				if err != nil {
+					return s
+				}
+				return strconv.Itoa(sum)
+			})
+		}
+	sum, err := calculateLine(line)
+	if err != nil {
+		panic("argh")
+	}
 	return sum
 }
 
-func calculateOperations(operations []string) int  {
+func calculateLine(line string) (int, error) {
+	splitted := strings.Split(line, " ")
+	sum, err := calculateOperations(splitted)
+	return sum, err
+}
+
+func calculateOperations(operations []string) (int, error) {
 	sum := 0
 	nextOperand := ""
 	for {
@@ -67,10 +100,8 @@ func calculateOperations(operations []string) int  {
 		op = strings.Trim(op, "(")
 		op = strings.Trim(op, ")")
 		number, err := strconv.Atoi(op)
-		if err != nil {
-			
-			fmt.Printf("ERROR for %s \n", op)				
-			break
+		if err != nil {			
+			return 0, err
 	
 		}
 		sum = calc(nextOperand, sum, number)
@@ -83,7 +114,7 @@ func calculateOperations(operations []string) int  {
 
 	}
 
-	return sum
+	return sum, nil
 }
 
 func calc(operand string, a int, b int) int {
