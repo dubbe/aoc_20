@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -23,7 +24,7 @@ func main() {
 func a(lines []string) int {
 	sum := 0
 	for _, line := range lines {
-		sum += calculateLine(line)
+		sum += calculate(line)
 	}
 	return sum
 }
@@ -33,17 +34,27 @@ func b(lines []string) int {
 	return 0
 }
 
+func calculate(line string) int {
+	find := regexp.MustCompile("\\(([0-9 +*])+\\)")
+		for find.MatchString(line) {
+			line = find.ReplaceAllStringFunc(line, func(s string) string {
+				sum := calculateLine(s)
+				return strconv.Itoa(sum)
+			})
+		}
+		
+	return calculateLine(line)
+}
+
 func calculateLine(line string) int {
 	splitted := strings.Split(line, " ")
-	sum, _ := calculate(splitted)
+	sum := calculateOperations(splitted)
 	return sum
 }
 
-func calculate(operations []string) (int, []string)  {
+func calculateOperations(operations []string) int  {
 	sum := 0
 	nextOperand := ""
-
-
 	for {
 		op := operations[0]
 
@@ -53,37 +64,26 @@ func calculate(operations []string) (int, []string)  {
 			continue
 		}
 
+		op = strings.Trim(op, "(")
+		op = strings.Trim(op, ")")
 		number, err := strconv.Atoi(op)
 		if err != nil {
-			if strings.HasPrefix(op, "(") {
-				operations[0] = op[1:]
-				number, operations = calculate(operations)
-			} else if strings.HasSuffix(op, ")") {
-				number, err = strconv.Atoi(strings.TrimRight(op, ")"))
-				if(err != nil) {
-					fmt.Println("ERROR")
-					operations = operations[1:]
-					continue
-				}
-				sum = calc(nextOperand, sum, number)
-				return sum, operations
-			}
+			
+			fmt.Printf("ERROR for %s \n", op)				
+			break
+	
 		}
 		sum = calc(nextOperand, sum, number)
 		
-		if len(operations) == 0 {
-			break;
-		}
-
 		operations = operations[1:]
 
 		if len(operations) == 0 {
-			break;
+			break
 		}
 
 	}
 
-	return sum, []string{}
+	return sum
 }
 
 func calc(operand string, a int, b int) int {
@@ -96,3 +96,4 @@ func calc(operand string, a int, b int) int {
 		return b
 	}
 }
+

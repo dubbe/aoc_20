@@ -24,5 +24,6 @@ func TestCalculateLine(t *testing.T) {
 	assert.Equal(t, 12240, calculateLine("5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))"))
 	assert.Equal(t, 13632, calculateLine("((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2"))
 	assert.Equal(t, 8, calculateLine("(2 + 2) + (2 + 2)"))
+	assert.Equal(t, 18, calculateLine("((1 + 1) + (1 + 1)) + 2 * 3"))
+	assert.Equal(t, 312, calculate("9 * (6 + 7 + (7 * 3)) + 6"))
 }
-
