@@ -52,8 +52,11 @@ func parseRules(rules map[int]string, index int) string {
 
 	rule := rules[index]
 	find := regexp.MustCompile("(\\d+)")
+	recursion := 0
 	for find.MatchString(rule) {
-
+		if(recursion > 50) {
+			break;
+		}
 		rule = find.ReplaceAllStringFunc(rule, func(s string) string {
 			number, err := strconv.Atoi(s)
 			if err != nil {
@@ -65,6 +68,13 @@ func parseRules(rules map[int]string, index int) string {
 			if len(str) == 1 && (str[0] == 'b' || str[0] == 'a') {			
 				return str
 			}
+
+			if strings.Contains(rules[number], fmt.Sprintf(" %d ", number))  {
+				fmt.Printf("recursion %s, %s \n", rules[number], s)
+				recursion++
+
+			}
+
 			return fmt.Sprintf("( %s )", rules[number])
 		})
 	}
@@ -103,12 +113,12 @@ func b(lines []string, startRule int) int {
 		}
 		rules[number] = line[test+2:]	
 	}
-
-	 // ARGH!!!
-	rules[8] = "42 | 42 (42 | 42 (42 | 42 (42 | 42 (42 | 42 (42 | 42 (42 | 42 (42 | 42 (42 | 42 (42 | 42 (42))))))))))"
-	rules[11] = "42 31 | 42 (42 31 | 42 (42 31 | 42 (42 31 | 42 (42 31 | 42 (42 31 | 42 (42 31 | 42 (42 31 | 42 (42 31 | 42 (42 31 | 42 (42 31 | 42 31) 31) 31) 31) 31) 31) 31) 31) 31) 31) 31"
+	
+	rules[8] = "42 | 42 8"
+	rules[11] = "42 31 | 42 11 31"
 
 	rule := regexp.MustCompile(`\A` + parseRules(rules, startRule) + `\z`)
+	fmt.Println(parseRules(rules, startRule))
 	for i := messageStartIndex; i < len(lines); i++ {
 		if rule.MatchString(lines[i]) {
 			sum++
