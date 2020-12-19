@@ -22,16 +22,6 @@ func TestBB(t *testing.T) {
 	assert.Equal(t, 12, b(lines, 0))
 }
 
-func TestB42(t *testing.T) {
-	lines, _ := helpers.ReadLines("input_test_b")
-	assert.Equal(t, 12, b(lines, 42))
-}
-
-func TestB31(t *testing.T) {
-	lines, _ := helpers.ReadLines("input_test_b")
-	assert.Equal(t, 12, b(lines, 31))
-}
-
 func TestASolution(t *testing.T) {
 	lines, _ := helpers.ReadLines("input")
 	assert.Equal(t, 180, a(lines))

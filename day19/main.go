@@ -21,30 +21,15 @@ func main() {
 }
 
 func a(lines []string) int {
-	rules := map[int]string{}
-	sum := 0
-	messageStartIndex := 0
-	for i, line := range lines {
-		if line == "" {
-			messageStartIndex = i+1
-			break
-		}
-		test := findFirstIndex(line, ':')
+	replace := map[int]string{}
+	return solve(lines, 0, replace)
+}
 
-		number, err := strconv.Atoi(line[0:test]) 
-		if(err != nil) {
-			panic("error")
-		}
-		rules[number] = line[test+2:]	
-	}
-
-	rule := regexp.MustCompile(`\A` + parseRules(rules, 0) + `\z`)
-	for i := messageStartIndex; i < len(lines); i++ {
-		if rule.MatchString(lines[i]) {
-			sum++
-		}
-	}
-	return sum
+func b(lines []string, startRule int) int {
+	replace := map[int]string{}
+	replace[8] = "42 | 42 8"
+	replace[11] = "42 31 | 42 11 31"
+	return solve(lines, startRule, replace)
 }
 
 
@@ -70,7 +55,6 @@ func parseRules(rules map[int]string, index int) string {
 			}
 
 			if strings.Contains(rules[number], fmt.Sprintf(" %d ", number))  {
-				fmt.Printf("recursion %s, %s \n", rules[number], s)
 				recursion++
 
 			}
@@ -95,8 +79,9 @@ func findFirstIndex(str string, find rune) int {
 	return 0
 }
 
-func b(lines []string, startRule int) int {
 
+
+func solve(lines []string, startRule int, replace map[int]string) int {
 	rules := map[int]string{}
 	sum := 0
 	messageStartIndex := 0
@@ -114,11 +99,12 @@ func b(lines []string, startRule int) int {
 		rules[number] = line[test+2:]	
 	}
 	
-	rules[8] = "42 | 42 8"
-	rules[11] = "42 31 | 42 11 31"
+	for k, v := range replace {
+		rules[k] = v
+	}
+	
 
 	rule := regexp.MustCompile(`\A` + parseRules(rules, startRule) + `\z`)
-	fmt.Println(parseRules(rules, startRule))
 	for i := messageStartIndex; i < len(lines); i++ {
 		if rule.MatchString(lines[i]) {
 			sum++
