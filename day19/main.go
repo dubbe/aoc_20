@@ -55,7 +55,6 @@ func parseRules(rules map[int]string, index int) string {
 
 			if strings.Contains(rules[number], fmt.Sprintf(" %d ", number)) {
 				recursion++
-
 			}
 
 			return fmt.Sprintf("( %s )", rules[number])
@@ -63,7 +62,7 @@ func parseRules(rules map[int]string, index int) string {
 	}
 
 	rule = strings.ReplaceAll(rule, " ", "")
-
+	fmt.Println(len(rule))
 	return rule
 
 }
@@ -86,13 +85,13 @@ func solve(lines []string, startRule int, replace map[int]string) int {
 			messageStartIndex = i + 1
 			break
 		}
-		test := findFirstIndex(line, ':')
+		index := findFirstIndex(line, ':')
 
-		number, err := strconv.Atoi(line[0:test])
+		number, err := strconv.Atoi(line[0:index])
 		if err != nil {
 			panic("error")
 		}
-		rules[number] = line[test+2:]
+		rules[number] = line[index+2:]
 	}
 
 	for k, v := range replace {
