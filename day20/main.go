@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -13,8 +14,8 @@ func main() {
 	start := time.Now()
 	lines, err := helpers.ReadGroups("input")
 	helpers.Check(err)
-	fmt.Printf("result A: %v\n", a(lines))
-	//fmt.Printf("result B: %v\n", b(lines))
+	//fmt.Printf("result A: %v\n", a(lines))
+	fmt.Printf("result B: %v\n", b(lines))
 	elapsed := time.Since(start)
 	fmt.Printf("Solution took %s", elapsed)
 }
@@ -32,7 +33,7 @@ type MatchedPicturePart struct {
 	Right  int
 	Top    int
 	Bottom int
-	ID int
+	ID     int
 }
 
 func a(groups []string) int {
@@ -41,7 +42,6 @@ func a(groups []string) int {
 	foundParts := []PicturePart{}
 	j := 0
 	for _, v := range pictureParts {
-		fmt.Printf("\n%d/%d\n", j, len(pictureParts))
 		foundParts = append(foundParts, findMatches(v, pictureParts))
 		j++
 	}
@@ -56,103 +56,209 @@ func a(groups []string) int {
 }
 
 func b(groups []string) int {
-	pictureParts := parseParts(groups)
+	for {
 
-	foundParts := map[int]PicturePart{}
-	for _, part := range pictureParts {
-		p := findMatches(part, pictureParts)
-		foundParts[p.ID] = p
-	}
+		pictureParts := parseParts(groups)
 
-	possibleCornerParts := []PicturePart{}
-	for _, part := range foundParts {
-		if part.MostMatches == 2 {
-			possibleCornerParts = append(possibleCornerParts, part)
+		foundParts := map[int]PicturePart{}
+		for _, part := range pictureParts {
+			p := findMatches(part, pictureParts)
+			foundParts[p.ID] = p
 		}
-	}
 
-	m := map[int]map[int]MatchedPicturePart{}
-	m[0] = map[int]MatchedPicturePart{}
-	Test:
-	for _, part := range possibleCornerParts {
-		for _, match := range part.Matches {
-			if match.Right != 0 && match.Bottom != 0 {
-				match.ID = part.ID
-				m[0][0] = match
-				break Test;
+		possibleCornerParts := []PicturePart{}
+		for _, part := range foundParts {
+			if part.MostMatches == 2 {
+				possibleCornerParts = append(possibleCornerParts, part)
 			}
 		}
-	}
 
-	i := 0
-	
-	for {
-		j := 0
+		m := map[int]map[int]MatchedPicturePart{}
+		m[0] = map[int]MatchedPicturePart{}
+	Test:
+		for _, part := range possibleCornerParts {
+			for _, match := range part.Matches {
+				if match.Right != 0 && match.Bottom != 0 {
+					match.ID = part.ID
+					m[0][0] = match
+					break Test
+				}
+			}
+		}
+
+		i := 0
+
 		for {
-			p, ok := m[i][j]
-			if ok {	
-				if p.Right == 0 {
-					break;
-				}		
-				part := foundParts[p.Right]
+			j := 0
+			for {
+				p, ok := m[i][j]
+				if ok {
+					if p.Right == 0 {
+						break
+					}
+					part := foundParts[p.Right]
+
+					for _, match := range part.Matches {
+						if match.Left == p.ID {
+							found := true
+							for x := 0; x < len(p.Matrix); x++ {
+								if p.Matrix[x][len(p.Matrix[0])-1] != match.Matrix[x][0] {
+									found = false
+									break
+								}
+							}
+							if found {
+								match.ID = part.ID
+								m[i][j+1] = match
+								break
+							}
+
+						}
+					}
+
+				} else {
+					break
+				}
+				j++
+			}
+			p, ok := m[i][0]
+			if ok {
+				if p.Bottom == 0 {
+					break
+				}
+				m[i+1] = map[int]MatchedPicturePart{}
+				part := foundParts[p.Bottom]
 				for _, match := range part.Matches {
-					if match.Left == p.ID {
-						match.ID = part.ID
-						m[i][j+1] = match
-						break;
+					if match.Top == p.ID {
+						found := true
+						fmt.Printf("-----------\n")
+						printMatrix(p.Matrix, true)
+						fmt.Printf("\n")
+						printMatrix(match.Matrix, true)
+						for x := 0; x < len(p.Matrix); x++ {
+
+							fmt.Printf("x: %d, y: %d", x, len(p.Matrix)-1)
+							fmt.Printf("%s %s \n", string(p.Matrix[len(p.Matrix)-1][x]), string(match.Matrix[0][x]))
+
+							if p.Matrix[len(p.Matrix)-1][x] != match.Matrix[0][x] {
+								found = false
+								break
+							}
+						}
+						if found {
+							match.ID = part.ID
+							m[i+1][0] = match
+							break
+						}
+
 					}
 				}
 			} else {
-				break;
+				break
 			}
-			j++
+			i++
 		}
-		p, ok := m[i][0]
-		if ok {	
-			if p.Bottom == 0 {
-				break;
+
+		finalImage := ""
+		finalImageTest := map[int]map[int]rune{}
+
+		// matrix grid
+		i = 0
+		j := 0
+
+		// image grid
+		x := 1
+		y := 1
+		matrix := m[j][i].Matrix
+
+		w := 0
+		z := 0
+		finalImageTest[z] = map[int]rune{}
+		for {
+			finalImage += string(matrix[y][x])
+			finalImageTest[z][w] = matrix[y][x]
+			w++
+			x++
+			if x > len(matrix)-2 {
+				x = 1
+				i++
+
+				if i > len(m)-1 {
+					i = 0
+					w = 0
+					y++
+
+					if y > len(matrix[y])-2 {
+						y = 1
+						j++
+
+						if j > len(m[j])-1 {
+							break
+						}
+
+					}
+					z++
+					finalImageTest[z] = map[int]rune{}
+					finalImage += "\n"
+				}
+				matrix = m[j][i].Matrix
 			}
-			m[i+1] = map[int]MatchedPicturePart{}
-			part := foundParts[p.Bottom]
-			for _, match := range part.Matches {
-				if match.Top == p.ID {
-						match.ID = part.ID
-						m[i+1][0] = match
-						break;
+		}
+
+		// fmt.Print(finalImage)
+		newImage := ""
+	FindImage:
+		for x := 0; x < 4; x++ {
+			for y := 0; y < 3; y++ {
+
+				image := sprintMatrix(finalImageTest, false)
+				found := false
+				for l := 0; l < len(finalImageTest[0])-len(".#..#..#..#..#..#..."); l++ {
+					re := regexp.MustCompile(fmt.Sprintf(".{%d}..................(#)..*\n.{%d}(#)....(#)(#)....(#)(#)....(#)(#)(#).*\n.{%d}.(#)..(#)..(#)..(#)..(#)..(#)....*", l, l, l))
+					for re.MatchString(image) {
+						found = true
+
+						index := re.FindStringSubmatchIndex(image)
+
+						for w := 2; w < len(index); w += 2 {
+							in := index[w]
+							image = image[:in] + "O" + image[in+1:]
+
+						}
+					}
+				}
+
+				if found {
+					newImage = image
+					break FindImage
+				}
+
+				if x == 0 {
+					finalImageTest = flipMatrixHor(finalImageTest)
+				} else if x == 1 {
+					finalImageTest = flipMatrixHor(finalImageTest)
+					finalImageTest = flipMatrixVert(finalImageTest)
+				} else {
+					finalImageTest = flipMatrixVert(finalImageTest)
 				}
 			}
-		} else {
-				break;
+
+			finalImageTest = rotateMatrix(finalImageTest)
 		}
-		i++
+		sum := strings.Count(newImage, "#")
+		if sum != 0 {
+			fmt.Print(newImage)
+
+			return sum
+		}
 	}
-
-
-	finalImage := map[int]map[int]rune{}
-
-	
-
-	for i:=0; i < 1;i++ {
-		_, ok := finalImage[i] 
-		if !ok {
-			finalImage[i] = map[int]rune{}
-		}
-		for j:=0; j < len(m); j++ {
-			finalImage = joinMaps(finalImage[i], m[j][i])
-		}
-		
-	}
-
-	printMatrix(finalImage)
-
-	return 0
 }
 
 func joinMaps(left, right map[int]rune) map[int]rune {
 	for key, rightVal := range right {
 		left[key] = rightVal
 	}
-	return left	
+	return left
 }
 
 func parseParts(groups []string) map[int]PicturePart {
@@ -266,7 +372,6 @@ func findMatches(part PicturePart, parts map[int]PicturePart) PicturePart {
 		}
 
 		matrix = rotateMatrix(matrix)
-		fmt.Print(".")
 	}
 
 	part.MostMatches = finalMatch
@@ -284,7 +389,7 @@ func getTopFromMatrix(matrix map[int]map[int]rune) string {
 
 func getBottomFromMatrix(matrix map[int]map[int]rune) string {
 	ret := ""
-	j := len(matrix)-1
+	j := len(matrix) - 1
 	for i := 0; i < len(matrix); i++ {
 		ret += fmt.Sprintf("%s", string(matrix[j][i]))
 	}
@@ -301,7 +406,7 @@ func getLeftFromMatrix(matrix map[int]map[int]rune) string {
 
 func getRightFromMatrix(matrix map[int]map[int]rune) string {
 	ret := ""
-	j := len(matrix)-1
+	j := len(matrix) - 1
 	for i := 0; i < len(matrix); i++ {
 		ret += fmt.Sprintf("%s", string(matrix[i][j]))
 	}
@@ -385,25 +490,46 @@ func printPicturePart(pp PicturePart) {
 	fmt.Printf("\nid: %d\n", pp.ID)
 
 	printMatches(pp.Matches)
-	printMatrix(pp.Matrix)
+	printMatrix(pp.Matrix, true)
 }
 
 func printMatches(matches []MatchedPicturePart) {
 	for _, match := range matches {
 
 		fmt.Printf("top: %d, right: %d, bottom: %d, left: %d \n ", match.Top, match.Right, match.Bottom, match.Left)
-		printMatrix(match.Matrix)
+		printMatrix(match.Matrix, true)
 		fmt.Printf("\n")
 	}
 }
 
-func printMatrix(matrix map[int]map[int]rune) {
+func printMatrix(matrix map[int]map[int]rune, printSpace bool) {
 	for i := 0; i < len(matrix); i++ {
 		value := matrix[i]
 		for j := 0; j < len(value); j++ {
 			v := value[j]
-			fmt.Printf("%s ", string(v))
+			if printSpace {
+				fmt.Printf("%s ", string(v))
+			} else {
+				fmt.Printf("%s", string(v))
+			}
 		}
 		fmt.Printf("\n")
 	}
+}
+
+func sprintMatrix(matrix map[int]map[int]rune, printSpace bool) string {
+	ret := ""
+	for i := 0; i < len(matrix); i++ {
+		value := matrix[i]
+		for j := 0; j < len(value); j++ {
+			v := value[j]
+			if printSpace {
+				ret += fmt.Sprintf("%s ", string(v))
+			} else {
+				ret += fmt.Sprintf("%s", string(v))
+			}
+		}
+		ret += fmt.Sprintf("\n")
+	}
+	return ret
 }

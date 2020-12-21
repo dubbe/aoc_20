@@ -18,10 +18,9 @@ func TestASolution(t *testing.T) {
 	assert.Equal(t, 5966506063747, a(lines))
 }
 
-
 func TestB(t *testing.T) {
 	lines, _ := helpers.ReadGroups("input_test")
-	assert.Equal(t, 0, b(lines))
+	assert.Equal(t, 273, b(lines))
 }
 
 func TestRotateMatrix(t *testing.T) {
@@ -29,19 +28,19 @@ func TestRotateMatrix(t *testing.T) {
 
 	fmt.Println("------ Original")
 	matrix := parseMatrix(lines[0])
-	printMatrix(matrix)
+	printMatrix(matrix, true)
 
 	fmt.Println("------ Rotate")
 	matrix = rotateMatrix(matrix)
-	printMatrix(matrix)
+	printMatrix(matrix, true)
 
 	fmt.Println("------ Flip")
 	matrix = flipMatrixVert(matrix)
-	printMatrix(matrix)
+	printMatrix(matrix, true)
 
 	fmt.Println("------ Flip Horizontal")
 	matrix = flipMatrixHor(matrix)
-	printMatrix(matrix)
+	printMatrix(matrix, true)
 
 	fmt.Println("------")
 
@@ -52,7 +51,7 @@ func TestGetSidesFromMatrix(t *testing.T) {
 	lines, _ := helpers.ReadGroups("input_test_2")
 	matrix := parseMatrix(lines[0])
 
-	printMatrix(matrix)
+	printMatrix(matrix, true)
 
 	assert.Equal(t, "#.#.##.##.", getTopFromMatrix(matrix))
 	assert.Equal(t, "#..###.#.#", getBottomFromMatrix(matrix))
