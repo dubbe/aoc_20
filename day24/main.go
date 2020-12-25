@@ -44,10 +44,32 @@ func a(lines []string) int {
 func b(lines []string) int {
 	tiles := startTiles(lines)
 
-	printTiles(tiles)
+	for i:=0;i<100;i++ {
 
-	for i:=0;i<1;i++ {
+		for z, values := range tiles {
+			for y, value := range values {
+				for x := range value {
+					for _, d := range getCubeDirections() {
+						_, ok := tiles[d.dz+z][d.dy+y][d.dx+x]
+						if !ok {
+							_, okz := tiles[d.dz+z]
+							if !okz {
+								tiles[d.dz+z] = map[int]map[int]bool{}
+							}
+
+							_, oky := tiles[d.dz+z][d.dy+y]
+							if !oky {
+								tiles[d.dz+z][d.dy+y] = map[int]bool{}
+							}
+							tiles[d.dz+z][d.dy+y][d.dx+x] = false
+						}
+					}
+				}
+			}
+		}
+
 		flippedTiles := map[int]map[int]map[int]bool{}
+
 
 		for z, values := range tiles {
 			for y, value := range values {
@@ -56,7 +78,7 @@ func b(lines []string) int {
 					blackTiles := calculateAdjacentBlackTiles(tiles, z, y, x)
 
 					if tile && (blackTiles == 0 || blackTiles > 2) {
-						newTile = !tile
+						newTile = false
 					} else if !tile &&  blackTiles == 2 {
 						newTile = !tile
 					}
@@ -77,10 +99,9 @@ func b(lines []string) int {
 			}
 		}
 		tiles = flippedTiles
-		fmt.Printf("Round %d, tiles: %d" , i+1, calculateBlackTiles(tiles))
 	}
 
-	return 0
+	return calculateBlackTiles(tiles)
 }
 
 func calculateBlackTiles(tiles map[int]map[int]map[int]bool) int {
@@ -128,23 +149,16 @@ func getCubeDirections() []cubeDirection {
 	}
 }
 
+
 func calculateAdjacentBlackTiles(tiles map[int]map[int]map[int]bool, z int, y int, x int) int {
 	ret := 0
-	fmt.Printf("###### x: %d, y: %d, z: %d ##### \n", x, y, z)
-	for _, a := range getCubeDirections() {
-					
+	for _, a := range getCubeDirections() {			
 		tile, ok := tiles[a.dz+z][a.dy+y][a.dx+x]
-		if ok {
-			if tile {
-				fmt.Printf("x: %d, y: %d, z: %d svart \n",a.dz+z, a.dy+y, a.dx+x)
+		if ok && tile {
 				ret++
-			} else {
-				fmt.Printf("x: %d, y: %d, z: %d vit \n", a.dz+z, a.dy+y, a.dx+x)
-			}
-		}
-
+			} 
 	}
-	fmt.Println("######")
+
 	return ret
 }
 

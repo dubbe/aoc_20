@@ -26,3 +26,38 @@ func TestB(t *testing.T) {
 	lines, _ := helpers.ReadLines("input_test")
 	assert.Equal(t, 2208, b(lines))
 }
+
+func TestCalculateAdjacentBlackTiles(t *testing.T) {
+
+	tiles := map[int]map[int]map[int]bool{}
+	tiles[0] = map[int]map[int]bool{}
+	tiles[0][0] = map[int]bool{}
+	tiles[0][0][0] = true
+	assert.Equal(t, 0, calculateAdjacentBlackTiles(tiles, 0,0,0))
+
+	tiles[0][-1] = map[int]bool{}
+	tiles[0][-1][1] = true
+	assert.Equal(t, 1, calculateAdjacentBlackTiles(tiles, 0,0,0))
+
+	tiles[0][1] = map[int]bool{}
+	tiles[0][1][-1] = true
+	assert.Equal(t, 2, calculateAdjacentBlackTiles(tiles, 0,0,0))
+
+	tiles[1] = map[int]map[int]bool{}
+	tiles[1][-1] = map[int]bool{}
+	tiles[1][-1][0] = true
+	assert.Equal(t, 3, calculateAdjacentBlackTiles(tiles, 0,0,0))
+
+	tiles[1][0] = map[int]bool{}
+	tiles[1][0][-1] = true
+	assert.Equal(t, 4, calculateAdjacentBlackTiles(tiles, 0,0,0))
+
+	tiles[-1] = map[int]map[int]bool{}
+	tiles[-1][1] = map[int]bool{}
+	tiles[-1][1][0] = true
+	assert.Equal(t, 5, calculateAdjacentBlackTiles(tiles, 0,0,0))
+
+	tiles[-1][0] = map[int]bool{}
+	tiles[-1][0][1] = true
+	assert.Equal(t, 6, calculateAdjacentBlackTiles(tiles, 0,0,0))
+}
